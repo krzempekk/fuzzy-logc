@@ -1,0 +1,41 @@
+plugins {
+    id 'java'
+    id 'org.openjfx.javafxplugin' version '0.0.9'
+
+}
+
+group 'org.example'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+    maven {
+        url "https://repository.ow2.org/nexus/content/repositories/public/"
+    }
+}
+
+javafx {
+    version = '12'
+    modules = ['javafx.controls', 'javafx.fxml']
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    // https://mvnrepository.com/artifact/net.sourceforge.jFuzzyLogic/jFuzzyLogic
+    compile group: 'net.sourceforge.jFuzzyLogic', name: 'jFuzzyLogic', version: '1.+'
+}
+
+apply plugin: 'java'
+
+defaultTasks 'runGui'
+
+task(runGui, dependsOn: 'classes', type: JavaExec) {
+    main = 'fuzzy.Controller'
+    classpath = sourceSets.main.runtimeClasspath
+}
+
+task(runExample, dependsOn: 'classes', type: JavaExec) {
+    main = 'fuzzy.FuzzyExample'
+    classpath = sourceSets.main.runtimeClasspath
+    args = ['src/main/resources/fuzzy_cleaner.fcl', '15', '3', '60', '10']
+}

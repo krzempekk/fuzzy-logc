@@ -1,0 +1,141 @@
+FUNCTION_BLOCK
+
+VAR_INPUT
+    front_contamination_level : REAL;
+    front_obstacle_distance : REAL;
+    front_left_contamination_level : REAL;
+    front_right_contamination_level : REAL;
+END_VAR
+
+VAR_OUTPUT
+    angle_change : REAL;
+END_VAR
+
+FUZZIFY front_contamination_level
+    TERM low := (0, 1) (25, 0);
+    TERM medium := (20, 0) (50, 1) (75, 0);
+    TERM high := (60, 0) (100, 1);
+END_FUZZIFY
+
+FUZZIFY front_left_contamination_level
+    TERM low := (0, 1) (15, 0);
+    TERM medium := (10, 0) (50, 1) (75, 0);
+    TERM high := (60, 0) (100, 1);
+END_FUZZIFY
+
+FUZZIFY front_right_contamination_level
+    TERM low := (0, 1) (15, 0);
+    TERM medium := (10, 0) (50, 1) (75, 0);
+    TERM high := (60, 0) (100, 1);
+END_FUZZIFY
+
+FUZZIFY front_obstacle_distance
+    TERM close := (1, 1) (3, 0);
+    TERM medium := (2, 0) (6, 1) (9, 0);
+    TERM distant := (6, 0) (10, 1);
+END_FUZZIFY
+
+DEFUZZIFY angle_change
+TERM left := (-45, 1) (-10, 0);
+TERM none := (-15, 0) (0, 1) (15, 0);
+TERM right := (10, 0) (45, 1);
+METHOD : COG;
+DEFAULT := 0;
+END_DEFUZZIFY
+
+RULEBLOCK first
+AND: MIN;
+ACT: MIN;
+
+RULE 3:
+    IF front_contamination_level IS high
+    AND front_obstacle_distance IS distant
+    THEN angle_change IS none;
+RULE 4:
+    IF front_contamination_level IS medium
+    AND front_obstacle_distance IS distant
+    THEN angle_change IS none;
+RULE 5:
+    IF front_contamination_level IS low
+    AND front_obstacle_distance IS distant
+    AND front_left_contamination_level IS high
+    THEN angle_change IS left;
+RULE 6:
+    IF front_contamination_level IS low
+    AND front_obstacle_distance IS distant
+    AND front_right_contamination_level IS high
+    THEN angle_change IS right;
+
+RULE 7:
+    IF front_contamination_level IS high
+    AND front_obstacle_distance IS medium
+    THEN angle_change IS none;
+RULE 8:
+    IF front_contamination_level IS medium
+    AND front_obstacle_distance IS medium
+    AND front_left_contamination_level IS high
+    THEN angle_change IS left;
+RULE 9:
+    IF front_contamination_level IS low
+    AND front_obstacle_distance IS medium
+    AND front_left_contamination_level IS high
+    THEN angle_change IS left;
+RULE 10:
+    IF front_contamination_level IS medium
+    AND front_obstacle_distance IS medium
+    AND front_left_contamination_level IS medium
+    THEN angle_change IS left;
+RULE 11:
+    IF front_contamination_level IS low
+    AND front_obstacle_distance IS medium
+    AND front_left_contamination_level IS medium
+    THEN angle_change IS left;
+RULE 12:
+    IF front_contamination_level IS medium
+    AND front_obstacle_distance IS medium
+    AND front_right_contamination_level IS high
+    THEN angle_change IS right;
+RULE 13:
+    IF front_contamination_level IS low
+    AND front_obstacle_distance IS medium
+    AND front_right_contamination_level IS high
+    THEN angle_change IS right;
+RULE 14:
+    IF front_contamination_level IS medium
+    AND front_obstacle_distance IS medium
+    AND front_right_contamination_level IS medium
+    THEN angle_change IS right;
+RULE 15:
+    IF front_contamination_level IS low
+    AND front_obstacle_distance IS medium
+    AND front_right_contamination_level IS medium
+    THEN angle_change IS right;
+
+RULE 16:
+    IF front_obstacle_distance IS close
+    AND front_right_contamination_level IS high
+    THEN angle_change IS right;
+RULE 17:
+    IF front_obstacle_distance IS close
+    AND front_left_contamination_level IS high
+    THEN angle_change IS left;
+RULE 18:
+    IF front_obstacle_distance IS close
+    AND front_right_contamination_level IS medium
+    THEN angle_change IS right;
+RULE 19:
+    IF front_obstacle_distance IS close
+    AND front_left_contamination_level IS medium
+    THEN angle_change IS left;
+RULE 20:
+    IF front_obstacle_distance IS close
+    AND front_right_contamination_level IS low
+    THEN angle_change IS right;
+RULE 21:
+    IF front_obstacle_distance IS close
+    AND front_left_contamination_level IS low
+    THEN angle_change IS left;
+
+END_RULEBLOCK
+
+END_FUNCTION_BLOCK
